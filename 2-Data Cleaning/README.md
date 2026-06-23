@@ -87,4 +87,29 @@ This folder contains the complete 9-part data cleaning and validation pipeline e
 *   **Updates and Alteration Code**: Completed the truncated filtering query into a robust, unified `CASE` statement. Permanently assigned these rows to a dedicated safety classification (`Redacted Identity (Security/Privacy Track)`), while routing high-level un-named administrators to an `Executive Track`.
 *   **After Changes**: Anonymous profiles are safely categorized under a protected track. This shields their financial data from standard deletion scripts, allowing you to include their budgets in high-level department reviews.
 
+---
+
+## 🔟 Overtime Rate Compliance Violations (The Time-and-a-Half Audit)
+*   **Objective**: Audit the system for critical labor compliance risks where calculated overtime hourly rates mathematically fall below standard regular hourly wages.
+*   **SQL Code File**: [`10_overtime_rate_compliance.sql`](https://github.com/Nikhil-Sagar29/NYC-Employee-Payroll-SQL-Analysis/blob/main/2-Data%20Cleaning/10_overtime_rate_compliance.sql)
+*   **Issues Pointed In This Data/Code**: 
+    *   Over 101,000 rows failed standard statutory time-and-a-half labor laws. 
+    *   For **28,161 Police Officers**, their regular rate was calculated at $30.33, but their overtime rate *dropped* to $27.67. 
+    *   This is an automated software math calculation glitch—not individual human error—affecting nearly **$299 Million** in overtime funds.
+*   **Updates and Alteration Code**: Applied a targeted `UPDATE` script to permanently flag all 101,829 affected rows as `'Labor Audit: Sub Standard Overtime Rate'` inside your engineered `Compliance_flag` column.
+*   **After Changes**: These high-risk lines are securely isolated. You can now present an actionable compliance discovery to management showing exactly where the payroll system exposes the organization to massive back-pay lawsuits and regulatory labor fines.
+
+---
+
+## ⑪ Contract vs. Gross Pay Deviations
+*   **Objective**: Identify full-time salaried workers whose actual take-home regular gross pay drastically deviates from their official baseline contract salary by more than $20,000.
+*   **SQL Code File**: [`11_gross_pay_deviations.sql`](https://github.com/Nikhil-Sagar29/NYC-Employee-Payroll-SQL-Analysis/blob/main/2-Data%20Cleaning/11_gross_pay_deviations.sql)
+*   **Issues Pointed In This Data/Code**: 
+    *   Isolated **692,868 rows** with massive salary gaps. 
+    *   The analysis exposed huge group clusters—like **12,092 separate Police Officers** and **2,078 Special Ed Teachers** hitting identical paycheck spikes in the exact same year, costing an extra **$504 Million** and **$57 Million**. 
+    *   This group clustering mathematically confirms a massive, delayed union contract settlement rather than individual data corruption.
+*   **Updates and Alteration Code**: Applied a permanent update script to route all 692k high-variance rows into a separate tracking category labeled as `'Operational: High Salary Deviation'` inside your engineered `Compliance_flag` column.
+*   **After Changes**: Massive, one-time collective bargaining back-pay payouts are cleanly segregated. Downstream analytics tools can now filter these rows out to view the city's true, unskewed baseline cost growth year-over-year.
+
+---
 
