@@ -44,46 +44,47 @@ This folder contains the complete 9-part data cleaning and validation pipeline e
 
 ---
 
-## 5️⃣ Text & Categorical Standardization
-*   **Objective**: Sanitize text fields across job titles and work locations to eliminate irregular casing, rogue punctuation, hidden spacing, and wildcard data-entry corruption.
-*   **SQL Code File**: [`05_text_and_categorical_standardization.sql`](https://github.com/Nikhil-Sagar29/NYC-Employee-Payroll-SQL-Analysis/blob/main/2-Data%20Cleaning/05_chronological_date_constraints.sql.sql)
-*   **Issues Pointed In This Data/Code**: System wildcard filters (`*`, `?`) were accidentally saved directly into text cells (e.g. `CLERK*`), breaking group counts. Replacing double spaces with a completely empty string (`''`) would accidentally crush words together (converting `CHIEF  ENGINEER` into `CHIEFENGINEER`). 
-*   **Updates and Alteration Code**: Used explicit `REPLACE()` functions to strip rogue characters and standardized double spaces down to clean, single-space gaps. Blank or missing titles and boroughs were unified under an `'Unknown'` tracking label.
-*   **After Changes**: Categorical text columns are clean and uniform. Bar charts and grouping models can now aggregate jobs or districts without spelling fragments splitting a single category into separate lines.
-
----
-
-## 6️⃣ Key Auditing & Duplicate Evaluation
-*   **Objective**: Patch empty data tracks in structural identification fields and scan for true duplicate profiles across identical fiscal cycles.
-*   **SQL Code File**: [`06_payroll_key_and_duplicate_auditing.sql`](https://github.com/Nikhil-Sagar29/NYC-Employee-Payroll-SQL-Analysis/blob/main/2-Data%20Cleaning/06_negative_value_corrections.sql)
-*   **Issues Pointed In This Data/Code**: Database `NULL` values in categorical keys break dashboard slicers and sorting layers. Running a broad `GROUP BY` on names and titles revealed thousands of repeated rows within the same fiscal year.
-*   **Updates and Alteration Code**: Converted missing `Payroll_number` values into a safe administrative `'0'` fallback marker. Conducted a career-split evaluation to confirm that these multi-row records represent separate contractual movements (like mid-year department changes or promotions) rather than database errors.
-*   **After Changes**: Primary keys are complete and ready for database relationships. Career-split records are cleanly preserved to maintain accurate municipal expense counts.
-
----
-
-## 7️⃣ Redacted Identity Masking
-*   **Objective**: Audit and categorize massive blocks of unidentifiable employee records to protect sensitive public safety profiles from accidental deletion filters.
-*   **SQL Code File**: [`07_redacted_identity_masking.sql`](https://github.com/Nikhil-Sagar29/NYC-Employee-Payroll-SQL-Analysis/blob/main/2-Data%20Cleaning/07_text_and_categorical_standardization.sql)
-*   **Issues Pointed In This Data/Code**: Over 65,000 profiles loaded with an `'Unknown Name'`. A simple cleaning filter might flag and purge these as duplicate rows, which would delete real payroll spending. Analysis proved these lines are clustered tightly in the Police Department and District Attorney offices.
-*   **Updates and Alteration Code**: Completed the truncated filtering query into a robust, unified `CASE` statement. Permanently assigned these rows to a dedicated safety classification (`Redacted Identity (Security/Privacy Track)`), while routing high-level un-named administrators to an `Executive Track`.
-*   **After Changes**: Anonymous profiles are safely categorized under a protected track. This shields their financial data from standard deletion scripts, allowing you to include their budgets in high-level department reviews.
-
----
-
-## 8️⃣ Time-Travel and Chronological Anomalies
+## 5️⃣ Time-Travel and Chronological Anomalies
 *   **Objective**: Audit employee timelines to isolate chronological errors where a hire date occurs in a future century or predates realistic modern employment horizons.
-*   **SQL Code File**: [`08_chronological_date_constraints.sql`](https://github.com/Nikhil-Sagar29/NYC-Employee-Payroll-SQL-Analysis/blob/main/2-Data%20Cleaning/08_payroll_key_and_duplicate_auditing.sql)
+*   **SQL Code File**: [`05_chronological_date_constraints.sql`](https://github.com/Nikhil-Sagar29/NYC-Employee-Payroll-SQL-Analysis/blob/main/2-Data%20Cleaning/05_chronological_date_constraints.sql.sql)
 *   **Issues Pointed In This Data/Code**: Identified over 500 rows pointing to `9999-12-31`. This is an enterprise system placeholder used when a contract has no finalized start date yet. Uncovered hundreds of profiles locked into `1901-01-01` showing zero hours worked, representing an automated system migration crash from legacy files. True working personnel hired in the mid-1940s were safely protected from the clean-up query.
 *   **Updates and Alteration Code**: Run dedicated `UPDATE` statements targeting only the explicit `9999-12-31` and `1901-01-01` system placeholder bugs, converting them safely into neutral database `NULL` markers.
 *   **After Changes**: Your timeline averages are fully protected from impossible data points. You can now track true career seniority patterns across the city without artificial default values distorting the history.
 
 ---
 
-## 9️⃣ Dynamic Future Checks & Negative Bookkeeping Corrections
+## 6️⃣ Dynamic Future Checks & Negative Bookkeeping Corrections
 *   **Objective**: Audit structural value boundaries to flag records listing start dates past today's execution window, while isolating negative number transactions.
-*   **SQL Code File**: [`09_negative_value_corrections.sql`](https://github.com/Nikhil-Sagar29/NYC-Employee-Payroll-SQL-Analysis/blob/main/2-Data%20Cleaning/09_redacted_identity_masking.sql)
+*   **SQL Code File**: [`06_negative_value_corrections.sql`](https://github.com/Nikhil-Sagar29/NYC-Employee-Payroll-SQL-Analysis/blob/main/2-Data%20Cleaning/06_negative_value_corrections.sql)
 *   **Issues Pointed In This Data/Code**: The conditional filter logic initially used <> NULL syntax which is a syntax bug that causes SQL engines to ignore rows; this was rewritten using explicit IS NOT NULL constraints. Over 16,000 entries returned negative hours and negative gross pay. This is a legitimate accounting practice called an overpayment clawback, used when HR takes back money paid out in error.
 *   **Updates and Alteration Code**: Corrected the syntax parameters using clean boolean brackets. Applied a permanent update script to route all 16,272 negative rows into a separate bookkeeping category labeled as 'Payroll Correction' inside your engineered Compliance_flag column.
 *   **After Changes**: Future timeline errors are fully neutralized. All negative accounting adjustments are cleanly cataloged under a safe tracking column, allowing reporting tools to filter them out instantly so they don't drag down normal salary averages.
-  
+
+---
+
+## 7️⃣ Text & Categorical Standardization
+*   **Objective**: Sanitize text fields across job titles and work locations to eliminate irregular casing, rogue punctuation, hidden spacing, and wildcard data-entry corruption.
+*   **SQL Code File**: [`07_text_and_categorical_standardization.sql`](https://github.com/Nikhil-Sagar29/NYC-Employee-Payroll-SQL-Analysis/blob/main/2-Data%20Cleaning/07_text_and_categorical_standardization.sql)
+*   **Issues Pointed In This Data/Code**: System wildcard filters (`*`, `?`) were accidentally saved directly into text cells (e.g. `CLERK*`), breaking group counts. Replacing double spaces with a completely empty string (`''`) would accidentally crush words together (converting `CHIEF  ENGINEER` into `CHIEFENGINEER`). 
+*   **Updates and Alteration Code**: Used explicit `REPLACE()` functions to strip rogue characters and standardized double spaces down to clean, single-space gaps. Blank or missing titles and boroughs were unified under an `'Unknown'` tracking label.
+*   **After Changes**: Categorical text columns are clean and uniform. Bar charts and grouping models can now aggregate jobs or districts without spelling fragments splitting a single category into separate lines.
+
+---
+
+## 8️⃣ Key Auditing & Duplicate Evaluation
+*   **Objective**: Patch empty data tracks in structural identification fields and scan for true duplicate profiles across identical fiscal cycles.
+*   **SQL Code File**: [`08_payroll_key_and_duplicate_auditing.sql`](https://github.com/Nikhil-Sagar29/NYC-Employee-Payroll-SQL-Analysis/blob/main/2-Data%20Cleaning/08_payroll_key_and_duplicate_auditing.sql)
+*   **Issues Pointed In This Data/Code**: Database `NULL` values in categorical keys break dashboard slicers and sorting layers. Running a broad `GROUP BY` on names and titles revealed thousands of repeated rows within the same fiscal year.
+*   **Updates and Alteration Code**: Converted missing `Payroll_number` values into a safe administrative `'0'` fallback marker. Conducted a career-split evaluation to confirm that these multi-row records represent separate contractual movements (like mid-year department changes or promotions) rather than database errors.
+*   **After Changes**: Primary keys are complete and ready for database relationships. Career-split records are cleanly preserved to maintain accurate municipal expense counts.
+
+---
+
+## 9️⃣ Redacted Identity Masking
+*   **Objective**: Audit and categorize massive blocks of unidentifiable employee records to protect sensitive public safety profiles from accidental deletion filters.
+*   **SQL Code File**: [`09_redacted_identity_masking.sql`](https://github.com/Nikhil-Sagar29/NYC-Employee-Payroll-SQL-Analysis/blob/main/2-Data%20Cleaning/09_redacted_identity_masking.sql)
+*   **Issues Pointed In This Data/Code**: Over 65,000 profiles loaded with an `'Unknown Name'`. A simple cleaning filter might flag and purge these as duplicate rows, which would delete real payroll spending. Analysis proved these lines are clustered tightly in the Police Department and District Attorney offices.
+*   **Updates and Alteration Code**: Completed the truncated filtering query into a robust, unified `CASE` statement. Permanently assigned these rows to a dedicated safety classification (`Redacted Identity (Security/Privacy Track)`), while routing high-level un-named administrators to an `Executive Track`.
+*   **After Changes**: Anonymous profiles are safely categorized under a protected track. This shields their financial data from standard deletion scripts, allowing you to include their budgets in high-level department reviews.
+
+
